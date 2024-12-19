@@ -3,38 +3,24 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 0 0% 100%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-light-border dark:border-dark-border;
-  }
-
   body {
     @apply bg-light-background dark:bg-dark-background text-light-text dark:text-dark-text min-h-screen;
   }
 
-  input, 
-  textarea, 
+  input,
+  textarea,
   select {
-    @apply block w-full rounded-md border border-light-border dark:border-dark-border bg-light-background dark:bg-dark-background px-4 py-2 text-sm outline-none transition-colors;
+    @apply w-full rounded-md border border-light-border dark:border-dark-border bg-light-background dark:bg-dark-background px-4 py-2;
+    @apply text-light-text dark:text-dark-text text-sm outline-none transition-colors;
     @apply placeholder:text-light-text/60 dark:placeholder:text-dark-text/60;
     @apply focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:focus:border-primary-400 dark:focus:ring-primary-400;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
   }
 }
 
 @layer components {
   .container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
   .btn-primary {
@@ -50,12 +36,56 @@
     @apply transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
+  .btn-white {
+    @apply inline-flex items-center justify-center rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-primary-600 shadow-sm;
+    @apply hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white;
+    @apply transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-white-outline {
+    @apply inline-flex items-center justify-center rounded-md bg-transparent px-5 py-2.5 text-sm font-semibold text-white shadow-sm;
+    @apply ring-1 ring-inset ring-white/20;
+    @apply hover:bg-white/10;
+    @apply transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
   .card {
-    @apply rounded-lg bg-light-card dark:bg-dark-card p-6 shadow-sm ring-1 ring-light-border dark:ring-dark-border;
+    @apply rounded-lg bg-light-card dark:bg-dark-card p-6 shadow-sm;
+    @apply ring-1 ring-light-border dark:ring-dark-border;
   }
 
   .link {
     @apply text-primary-600 dark:text-primary-400 hover:underline;
     @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400;
+  }
+
+  .badge-success {
+    @apply bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400;
+  }
+
+  .badge-error {
+    @apply bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400;
+  }
+}
+
+@layer utilities {
+  .bg-grid-light {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(15 23 42 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+  }
+
+  .bg-grid-dark {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(148 163 184 / 0.05)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
   }
 }
