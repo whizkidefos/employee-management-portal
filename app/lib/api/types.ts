@@ -4,64 +4,48 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
   phoneNumber: string;
-  jobRole: string;
 }
 
 export interface UserProfile {
+  id: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   phoneNumber: string;
-  jobRole: string;
-  avatar?: string;
-  isVerified: boolean;
   isAdmin: boolean;
+  jobRole?: string;
   dateOfBirth?: string;
-  gender?: 'male' | 'female';
+  gender?: string;
   postcode?: string;
   address?: string;
   country?: string;
-  hasCautions?: boolean;
   nationalInsuranceNumber?: string;
-  hasEnhancedDBS?: boolean;
-  nationality?: 'UK' | 'EU' | 'Other';
-  rightToWork?: boolean;
-  brpNumber?: string;
-  references?: Reference[];
-  workHistory?: string;
-  consent?: boolean;
-  trainings?: Training[];
-  otherTrainings?: OtherTraining[];
+  nationality?: string;
+  workHistory?: WorkHistory[];
   bankDetails?: BankDetails;
   signature?: string;
-  signatureDate?: string;
+  profileImage?: string;
+  isPhoneVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Reference {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-export interface Training {
-  name: string;
-  passed: boolean;
-  datePassed?: string;
-}
-
-export interface OtherTraining {
-  name: string;
-  datePassed: string;
+export interface WorkHistory {
+  employer: string;
+  position: string;
+  startDate: string;
+  endDate?: string;
+  responsibilities: string;
 }
 
 export interface BankDetails {
-  sortCode: string;
   accountNumber: string;
+  sortCode: string;
   bankName: string;
 }
 
@@ -70,41 +54,57 @@ export interface Document {
   userId: string;
   type: string;
   status: 'pending' | 'approved' | 'rejected';
-  fileUrl: string;
-  expiryDate?: Date;
   comments?: string;
+  fileUrl: string;
+  expiryDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Shift {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  status: 'available' | 'booked' | 'completed';
+  hourlyRate: number;
+  bookedBy?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Course {
   id: string;
   title: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  instructor: string;
+  startDate: string;
+  endDate: string;
+  status: 'upcoming' | 'ongoing' | 'completed';
   capacity: number;
   enrolled: number;
-  instructor: string;
-  status: 'upcoming' | 'ongoing' | 'completed';
   price: number;
-}
-
-export interface Shift {
-  id: string;
-  userId?: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  location: string;
-  status: 'available' | 'booked' | 'completed';
-  hourlyRate: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Payment {
   id: string;
   userId: string;
-  shiftId?: string;
   amount: number;
-  status: 'pending' | 'completed' | 'failed';
-  paymentMethod: string;
-  description?: string;
+  description: string;
+  date: string;
+  status: 'pending' | 'paid' | 'failed';
+  payslipUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardStats {
+  totalEmployees: number;
+  activeShifts: number;
+  pendingDocuments: number;
+  ongoingTrainings: number;
+  pendingPayments: number;
 }

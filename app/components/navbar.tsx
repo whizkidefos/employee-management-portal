@@ -2,23 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { ThemeToggle } from './theme-toggle';
 import { Logo } from './logo';
 import { MobileMenu } from './mobile-menu';
-
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard' },
-  { name: 'Employees', href: '/employees' },
-  { name: 'Departments', href: '/departments' },
-  { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
-  { name: 'Settings', href: '/settings' },
-];
+import { NavLink } from './nav-link';
+import { mainNavigation } from '../config/navigation';
 
 export function Navbar() {
-  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -31,38 +22,36 @@ export function Navbar() {
               <span className="sr-only">New Horizon Healthcare Services</span>
             </Link>
             <div className="hidden lg:flex lg:gap-x-8">
-              {navigation.map((item) => (
-                <Link
+              {mainNavigation.map((item) => (
+                <NavLink
                   key={item.name}
                   href={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
-                    pathname === item.href
-                      ? 'text-primary-600 dark:text-primary-400'
-                      : 'text-light-text/60 dark:text-dark-text/60'
-                  }`}
+                  className="text-sm font-medium"
                 >
                   {item.name}
-                </Link>
+                </NavLink>
               ))}
             </div>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <div className="hidden lg:flex lg:items-center lg:gap-4">
-              <Link href="/login" className="btn-secondary">
+              <NavLink href="/login" className="text-sm font-medium">
                 Sign in
-              </Link>
-              <Link href="/register" className="btn-primary">
-                Get started
+              </NavLink>
+              <Link
+                href="/register"
+                className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-500 dark:bg-primary-400 dark:hover:bg-primary-300"
+              >
+                Register
               </Link>
             </div>
             <button
               type="button"
-              className="relative -m-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-light-card dark:hover:bg-dark-card lg:hidden"
+              className="lg:hidden -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-light-text/60"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <span className="absolute -inset-0.5" />
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Open main menu</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>

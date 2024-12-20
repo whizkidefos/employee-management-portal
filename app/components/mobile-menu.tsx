@@ -2,19 +2,11 @@
 
 import { Fragment } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Logo } from './logo';
-
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard' },
-  { name: 'Employees', href: '/employees' },
-  { name: 'Departments', href: '/departments' },
-  { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
-  { name: 'Settings', href: '/settings' },
-];
+import { NavLink } from './nav-link';
+import { mainNavigation } from '../config/navigation';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -22,8 +14,6 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
-  const pathname = usePathname();
-
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50 lg:hidden" onClose={setIsOpen}>
@@ -49,62 +39,68 @@ export function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
-            <Dialog.Panel className="relative flex w-full max-w-xs flex-col overflow-y-auto bg-light-background dark:bg-dark-background pb-12 shadow-xl">
-              <div className="flex px-4 pb-2 pt-5">
-                <button
-                  type="button"
-                  className="relative -m-2 inline-flex items-center justify-center rounded-md p-2 hover:bg-light-card dark:hover:bg-dark-card"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span className="absolute -inset-0.5" />
-                  <span className="sr-only">Close menu</span>
-                  <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
+            <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-in-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in-out duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="absolute right-0 top-0 -mr-16 flex pt-4 pr-2">
+                  <button
+                    type="button"
+                    className="relative -m-2.5 p-2.5 text-white"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <span className="sr-only">Close sidebar</span>
+                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                </div>
+              </Transition.Child>
 
-              <div className="mt-2">
-                <Link href="/" className="flex items-center gap-2 px-4" onClick={() => setIsOpen(false)}>
+              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-light-background dark:bg-dark-background px-6 pb-4">
+                <div className="flex h-16 shrink-0 items-center">
                   <Logo className="h-8 w-auto" />
-                </Link>
-              </div>
-
-              <div className="space-y-6 border-t border-light-border dark:border-dark-border px-4 py-6">
-                {navigation.map((item) => (
-                  <div key={item.name} className="-m-3">
-                    <Link
-                      href={item.href}
-                      className={`block rounded-lg px-3 py-2 text-base font-medium hover:bg-light-card dark:hover:bg-dark-card ${
-                        pathname === item.href
-                          ? 'text-primary-600 dark:text-primary-400'
-                          : 'text-light-text/60 dark:text-dark-text/60'
-                      }`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-6 border-t border-light-border dark:border-dark-border px-4 py-6">
-                <div className="flow-root">
-                  <Link
-                    href="/login"
-                    className="block rounded-lg px-3 py-2 text-base font-medium text-light-text/60 hover:bg-light-card hover:text-light-text dark:text-dark-text/60 dark:hover:bg-dark-card dark:hover:text-dark-text"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Sign in
-                  </Link>
                 </div>
-                <div className="flow-root">
-                  <Link
-                    href="/register"
-                    className="block rounded-lg px-3 py-2 text-base font-medium text-primary-600 hover:bg-light-card dark:text-primary-400 dark:hover:bg-dark-card"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Get started
-                  </Link>
-                </div>
+                <nav className="flex flex-1 flex-col">
+                  <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                    <li>
+                      <ul role="list" className="-mx-2 space-y-1">
+                        {mainNavigation.map((item) => (
+                          <li key={item.name}>
+                            <NavLink
+                              href={item.href}
+                              className="group flex gap-x-3 rounded-md p-2 text-sm font-semibold"
+                              activeClassName="bg-light-border dark:bg-dark-border text-primary-600 dark:text-primary-400"
+                              inactiveClassName="text-light-text/60 dark:text-dark-text/60 hover:text-light-text hover:bg-light-border dark:hover:text-dark-text dark:hover:bg-dark-border"
+                            >
+                              {item.name}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                    <li className="mt-auto">
+                      <div className="flex flex-col gap-4">
+                        <NavLink
+                          href="/login"
+                          className="text-sm font-medium text-center"
+                        >
+                          Sign in
+                        </NavLink>
+                        <Link
+                          href="/register"
+                          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-500 dark:bg-primary-400 dark:hover:bg-primary-300 text-center"
+                        >
+                          Register
+                        </Link>
+                      </div>
+                    </li>
+                  </ul>
+                </nav>
               </div>
             </Dialog.Panel>
           </Transition.Child>
