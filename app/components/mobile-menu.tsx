@@ -52,7 +52,7 @@ export function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
                 <div className="absolute right-0 top-0 -mr-16 flex pt-4 pr-2">
                   <button
                     type="button"
-                    className="relative -m-2.5 p-2.5 text-white"
+                    className="relative -m-2.5 p-2.5 text-light-text dark:text-dark-text"
                     onClick={() => setIsOpen(false)}
                   >
                     <span className="sr-only">Close sidebar</span>

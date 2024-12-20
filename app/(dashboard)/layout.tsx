@@ -3,11 +3,12 @@
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { Dialog, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/app/lib/utils';
 import { useAuth } from '@/app/lib/contexts/auth-context';
 import { NavLink } from '@/app/components/nav-link';
 import { userNavigation, adminNavigation } from '@/app/config/navigation';
+import { Logo } from '@/app/components/logo';
 import type { NavigationItem } from '@/app/config/navigation';
 
 export default function DashboardLayout({
@@ -16,6 +17,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { user, isAdmin } = useAuth();
   
   const navigation = isAdmin ? adminNavigation : userNavigation;
@@ -63,7 +65,7 @@ export default function DashboardLayout({
                   <div className="absolute right-0 top-0 -mr-16 flex pt-4 pr-2">
                     <button
                       type="button"
-                      className="relative -m-2.5 p-2.5 text-white"
+                      className="relative -m-2.5 p-2.5 text-light-text dark:text-dark-text"
                       onClick={() => setSidebarOpen(false)}
                     >
                       <span className="sr-only">Close sidebar</span>
@@ -74,11 +76,7 @@ export default function DashboardLayout({
 
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-light-background dark:bg-dark-background px-6 pb-4">
                   <div className="flex h-16 shrink-0 items-center">
-                    <img
-                      className="h-8 w-auto"
-                      src="/logo.svg"
-                      alt="New Horizon Healthcare Services"
-                    />
+                    <Logo className="h-8 w-auto" />
                   </div>
                   <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -95,7 +93,7 @@ export default function DashboardLayout({
                                 <item.icon
                                   className={cn(
                                     'h-6 w-6 shrink-0',
-                                    'text-light-text/40 group-hover:text-light-text dark:text-dark-text/40 dark:group-hover:text-dark-text'
+                                    'text-light-text/60 dark:text-dark-text/60 group-hover:text-light-text dark:group-hover:text-dark-text'
                                   )}
                                   aria-hidden="true"
                                 />
@@ -115,14 +113,22 @@ export default function DashboardLayout({
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+      <div 
+        className={cn(
+          "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col",
+          isCollapsed ? "lg:w-20" : "lg:w-72",
+          "transition-all duration-300 ease-in-out"
+        )}
+        onMouseEnter={() => isAdmin && setIsCollapsed(false)}
+        onMouseLeave={() => isAdmin && setIsCollapsed(true)}
+      >
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-light-border dark:border-dark-border bg-light-background dark:bg-dark-background px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
-            <img
-              className="h-8 w-auto"
-              src="/logo.svg"
-              alt="New Horizon Healthcare Services"
-            />
+            {isCollapsed ? (
+              <Logo className="h-8 w-8" />
+            ) : (
+              <Logo className="h-8 w-auto" />
+            )}
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -132,18 +138,29 @@ export default function DashboardLayout({
                     <li key={item.name}>
                       <NavLink
                         href={item.href}
-                        className="group flex gap-x-3 rounded-md p-2 text-sm font-semibold"
+                        className={cn(
+                          "group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold",
+                          isCollapsed && "justify-center"
+                        )}
                         activeClassName="bg-light-border dark:bg-dark-border text-primary-600 dark:text-primary-400"
                         inactiveClassName="text-light-text/60 dark:text-dark-text/60 hover:text-light-text hover:bg-light-border dark:hover:text-dark-text dark:hover:bg-dark-border"
                       >
                         <item.icon
                           className={cn(
                             'h-6 w-6 shrink-0',
-                            'text-light-text/40 group-hover:text-light-text dark:text-dark-text/40 dark:group-hover:text-dark-text'
+                            'text-light-text/60 dark:text-dark-text/60 group-hover:text-light-text dark:group-hover:text-dark-text',
+                            isCollapsed && "mr-0"
                           )}
                           aria-hidden="true"
                         />
-                        {item.name}
+                        <span
+                          className={cn(
+                            "transition-all duration-300",
+                            isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                          )}
+                        >
+                          {item.name}
+                        </span>
                       </NavLink>
                     </li>
                   ))}
@@ -154,11 +171,14 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      <div className="lg:pl-72">
+      <div className={cn(
+        "transition-all duration-300 ease-in-out",
+        isCollapsed ? "lg:pl-20" : "lg:pl-72"
+      )}>
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-light-border dark:border-dark-border bg-light-background dark:bg-dark-background px-4 sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
-            className="-m-2.5 p-2.5 text-light-text/60 lg:hidden"
+            className="-m-2.5 p-2.5 text-light-text/60 dark:text-dark-text/60 hover:text-light-text dark:hover:text-dark-text lg:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
@@ -166,18 +186,10 @@ export default function DashboardLayout({
           </button>
 
           {/* Separator */}
-          <div
-            className="h-6 w-px bg-light-border dark:bg-dark-border lg:hidden"
-            aria-hidden="true"
-          />
+          <div className="h-6 w-px bg-light-border dark:bg-dark-border lg:hidden" aria-hidden="true" />
 
-          <div className="flex flex-1 justify-end gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              {/* Profile dropdown */}
-              <span className="text-sm font-medium">
-                Welcome, {user?.firstName}!
-              </span>
-            </div>
+          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+            <div className="flex flex-1" />
           </div>
         </div>
 
