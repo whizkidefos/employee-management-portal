@@ -16,6 +16,7 @@ export interface UserProfile {
   email: string;
   firstName: string;
   lastName: string;
+  name?: string;
   phoneNumber: string;
   isAdmin: boolean;
   jobRole?: string;
@@ -52,6 +53,7 @@ export interface BankDetails {
 export interface Document {
   id: string;
   userId: string;
+  employeeName?: string;
   type: string;
   status: 'pending' | 'approved' | 'rejected';
   comments?: string;
@@ -63,6 +65,7 @@ export interface Document {
 
 export interface Shift {
   id: string;
+  employeeName?: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -92,6 +95,7 @@ export interface Course {
 export interface Payment {
   id: string;
   userId: string;
+  employeeName?: string;
   amount: number;
   description: string;
   date: string;
@@ -107,4 +111,47 @@ export interface DashboardStats {
   pendingDocuments: number;
   ongoingTrainings: number;
   pendingPayments: number;
+}
+
+export interface AnalyticsData {
+  employeeCount: number;
+  totalPayments: number;
+  activeDocuments: number;
+  trainingHours: number;
+  employeeGrowth: number;
+  paymentGrowth: number;
+  documentGrowth: number;
+  trainingGrowth: number;
+  employeeGrowthData: {
+    labels: string[];
+    values: number[];
+  };
+  paymentData: {
+    labels: string[];
+    values: number[];
+  };
+  documentStatusData: {
+    labels: string[];
+    values: number[];
+  };
+  trainingData: {
+    labels: string[];
+    completed: number[];
+    inProgress: number[];
+  };
+}
+
+export interface Training {
+  id: string;
+  title: string;
+  description: string;
+  employeeId: string;
+  employeeName?: string;
+  startDate: string;
+  endDate: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  type: string;
+  assignedBy: string;
+  createdAt: string;
+  updatedAt: string;
 }

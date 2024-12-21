@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/lib/contexts/auth-context';
 import { PageHeader } from '@/app/components/page-header';
+import { usersApi } from '@/app/lib/api';
 import { 
   XCircleIcon,
   CheckCircleIcon,
@@ -10,43 +11,78 @@ import {
   BellIcon,
   ShieldCheckIcon,
   PaintBrushIcon,
+  GlobeAltIcon,
+  KeyIcon,
+  CloudArrowDownIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 interface SettingsFormData {
   notifications: {
     email: boolean;
     push: boolean;
     sms: boolean;
+    documents: boolean;
+    payments: boolean;
+    shifts: boolean;
+    training: boolean;
   };
-  theme: 'light' | 'dark' | 'system';
-  language: string;
+  appearance: {
+    theme: 'light' | 'dark' | 'system';
+    language: string;
+    timezone: string;
+    density: 'comfortable' | 'compact';
+  };
+  privacy: {
+    profileVisibility: 'public' | 'private' | 'contacts';
+    emailVisibility: boolean;
+    phoneVisibility: boolean;
+  };
 }
 
 export default function SettingsPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<SettingsFormData>({
     notifications: {
       email: true,
       push: true,
       sms: false,
+      documents: true,
+      payments: true,
+      shifts: true,
+      training: true,
     },
-    theme: 'system',
-    language: 'en',
+    appearance: {
+      theme: 'system',
+      language: 'en',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      density: 'comfortable',
+    },
+    privacy: {
+      profileVisibility: 'public',
+      emailVisibility: true,
+      phoneVisibility: false,
+    },
   });
 
   useEffect(() => {
     // Load user settings when component mounts
     const loadSettings = async () => {
       try {
-        // TODO: Implement settings API
-        // const settings = await api.getUserSettings();
-        // setFormData(settings);
+        const settings = await usersApi.getUserSettings();
+        setFormData(settings);
+        if (user?.profileImage) {
+          setImagePreview(user.profileImage);
+        }
       } catch (err) {
-        setError('Failed to load settings');
+        console.error('Failed to load settings:', err);
       }
     };
 
@@ -55,6 +91,18 @@ export default function SettingsPage() {
     }
   }, [isLoading, user]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -62,8 +110,17 @@ export default function SettingsPage() {
     setSuccess(null);
 
     try {
-      // TODO: Implement settings API
-      // await api.updateUserSettings(formData);
+      // Upload profile image if changed
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        await usersApi.updateProfileImage(formData);
+      }
+
+      // Update user settings
+      await usersApi.updateUserSettings(formData);
+      
+      await refreshUser();
       setSuccess('Settings updated successfully');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update settings');
@@ -114,13 +171,44 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Profile Section */}
           <div className="card p-6">
             <div className="flex items-center gap-2 mb-4">
               <UserCircleIcon className="h-5 w-5 text-primary-600" />
               <h3 className="text-lg font-medium">Profile</h3>
             </div>
             <div className="space-y-4">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  {imagePreview ? (
+                    <Image
+                      src={imagePreview}
+                      alt="Profile"
+                      width={100}
+                      height={100}
+                      className="rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                      <UserCircleIcon className="w-16 h-16 text-gray-400" />
+                    </div>
+                  )}
+                  <label
+                    htmlFor="profile-image"
+                    className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md cursor-pointer hover:bg-gray-50"
+                  >
+                    <PaintBrushIcon className="w-4 h-4 text-gray-600" />
+                  </label>
+                  <input
+                    type="file"
+                    id="profile-image"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </div>
+              </div>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium">
                   Name
@@ -148,6 +236,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
+          {/* Notifications Section */}
           <div className="card p-6">
             <div className="flex items-center gap-2 mb-4">
               <BellIcon className="h-5 w-5 text-primary-600" />
@@ -214,9 +303,42 @@ export default function SettingsPage() {
                   }
                 />
               </div>
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium mb-3">Notification Types</h4>
+                <div className="space-y-3">
+                  {Object.entries({
+                    documents: 'Document Updates',
+                    payments: 'Payment Updates',
+                    shifts: 'Shift Updates',
+                    training: 'Training Updates',
+                  }).map(([key, label]) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <label htmlFor={`notify-${key}`} className="text-sm">
+                        {label}
+                      </label>
+                      <input
+                        type="checkbox"
+                        id={`notify-${key}`}
+                        className="toggle"
+                        checked={formData.notifications[key as keyof typeof formData.notifications]}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            notifications: {
+                              ...formData.notifications,
+                              [key]: e.target.checked,
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Appearance Section */}
           <div className="card p-6">
             <div className="flex items-center gap-2 mb-4">
               <PaintBrushIcon className="h-5 w-5 text-primary-600" />
@@ -230,11 +352,14 @@ export default function SettingsPage() {
                 <select
                   id="theme"
                   className="input mt-1"
-                  value={formData.theme}
+                  value={formData.appearance.theme}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      theme: e.target.value as 'light' | 'dark' | 'system',
+                      appearance: {
+                        ...formData.appearance,
+                        theme: e.target.value as 'light' | 'dark' | 'system',
+                      },
                     })
                   }
                 >
@@ -250,22 +375,49 @@ export default function SettingsPage() {
                 <select
                   id="language"
                   className="input mt-1"
-                  value={formData.language}
+                  value={formData.appearance.language}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      language: e.target.value,
+                      appearance: {
+                        ...formData.appearance,
+                        language: e.target.value,
+                      },
                     })
                   }
                 >
                   <option value="en">English</option>
                   <option value="es">Spanish</option>
                   <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="density" className="block text-sm font-medium">
+                  Display Density
+                </label>
+                <select
+                  id="density"
+                  className="input mt-1"
+                  value={formData.appearance.density}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      appearance: {
+                        ...formData.appearance,
+                        density: e.target.value as 'comfortable' | 'compact',
+                      },
+                    })
+                  }
+                >
+                  <option value="comfortable">Comfortable</option>
+                  <option value="compact">Compact</option>
                 </select>
               </div>
             </div>
           </div>
 
+          {/* Security Section */}
           <div className="card p-6">
             <div className="flex items-center gap-2 mb-4">
               <ShieldCheckIcon className="h-5 w-5 text-primary-600" />
@@ -274,21 +426,121 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <button
                 type="button"
-                className="btn-secondary w-full"
+                className="btn-secondary w-full flex items-center justify-center gap-2"
                 onClick={() => {
                   // TODO: Implement password change
                 }}
               >
+                <KeyIcon className="h-4 w-4" />
                 Change Password
               </button>
               <button
                 type="button"
-                className="btn-secondary w-full"
+                className="btn-secondary w-full flex items-center justify-center gap-2"
                 onClick={() => {
                   // TODO: Implement 2FA
                 }}
               >
+                <ShieldCheckIcon className="h-4 w-4" />
                 Enable Two-Factor Authentication
+              </button>
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium mb-3">Privacy Settings</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="profile-visibility" className="block text-sm font-medium">
+                      Profile Visibility
+                    </label>
+                    <select
+                      id="profile-visibility"
+                      className="input mt-1"
+                      value={formData.privacy.profileVisibility}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          privacy: {
+                            ...formData.privacy,
+                            profileVisibility: e.target.value as 'public' | 'private' | 'contacts',
+                          },
+                        })
+                      }
+                    >
+                      <option value="public">Public</option>
+                      <option value="private">Private</option>
+                      <option value="contacts">Contacts Only</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="email-visibility" className="text-sm">
+                      Show Email Address
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="email-visibility"
+                      className="toggle"
+                      checked={formData.privacy.emailVisibility}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          privacy: {
+                            ...formData.privacy,
+                            emailVisibility: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="phone-visibility" className="text-sm">
+                      Show Phone Number
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="phone-visibility"
+                      className="toggle"
+                      checked={formData.privacy.phoneVisibility}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          privacy: {
+                            ...formData.privacy,
+                            phoneVisibility: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Section */}
+          <div className="card p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <UserCircleIcon className="h-5 w-5 text-primary-600" />
+              <h3 className="text-lg font-medium">Account</h3>
+            </div>
+            <div className="space-y-4">
+              <button
+                type="button"
+                className="btn-secondary w-full flex items-center justify-center gap-2"
+                onClick={() => {
+                  // TODO: Implement data export
+                }}
+              >
+                <CloudArrowDownIcon className="h-4 w-4" />
+                Export Account Data
+              </button>
+              <button
+                type="button"
+                className="btn-danger w-full flex items-center justify-center gap-2"
+                onClick={() => {
+                  // TODO: Implement account deactivation
+                }}
+              >
+                <TrashIcon className="h-4 w-4" />
+                Deactivate Account
               </button>
             </div>
           </div>

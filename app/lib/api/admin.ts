@@ -314,6 +314,134 @@ export const adminApi = {
     return response.json();
   },
 
+  // Training Management
+  async getTrainings() {
+    const response = await fetch(`${API_BASE_URL}/admin/trainings`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch trainings');
+    }
+
+    return response.json();
+  },
+
+  async getTraining(trainingId: string) {
+    const response = await fetch(`${API_BASE_URL}/admin/trainings/${trainingId}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch training');
+    }
+
+    return response.json();
+  },
+
+  async createTraining(trainingData: any) {
+    const response = await fetch(`${API_BASE_URL}/admin/trainings`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(trainingData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create training');
+    }
+
+    return response.json();
+  },
+
+  async updateTraining(trainingId: string, trainingData: any) {
+    const response = await fetch(`${API_BASE_URL}/admin/trainings/${trainingId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(trainingData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update training');
+    }
+
+    return response.json();
+  },
+
+  async updateTrainingStatus(trainingId: string, status: string) {
+    const response = await fetch(`${API_BASE_URL}/admin/trainings/${trainingId}/status`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update training status');
+    }
+
+    return response.json();
+  },
+
+  async deleteTraining(trainingId: string) {
+    const response = await fetch(`${API_BASE_URL}/admin/trainings/${trainingId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete training');
+    }
+  },
+
+  // Shift Management
+  async getShifts() {
+    const response = await fetch(`${API_BASE_URL}/admin/shifts`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch shifts');
+    }
+
+    return response.json();
+  },
+
+  async getShift(shiftId: string) {
+    const response = await fetch(`${API_BASE_URL}/admin/shifts/${shiftId}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch shift');
+    }
+
+    return response.json();
+  },
+
   async createShift(shiftData: any) {
     const response = await fetch(`${API_BASE_URL}/admin/shifts`, {
       method: 'POST',
@@ -348,6 +476,23 @@ export const adminApi = {
     return response.json();
   },
 
+  async updateShiftStatus(shiftId: string, status: string) {
+    const response = await fetch(`${API_BASE_URL}/admin/shifts/${shiftId}/status`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update shift status');
+    }
+
+    return response.json();
+  },
+
   async deleteShift(shiftId: string) {
     const response = await fetch(`${API_BASE_URL}/admin/shifts/${shiftId}`, {
       method: 'DELETE',
@@ -356,51 +501,6 @@ export const adminApi = {
 
     if (!response.ok) {
       throw new Error('Failed to delete shift');
-    }
-  },
-
-  async createTraining(trainingData: any) {
-    const response = await fetch(`${API_BASE_URL}/admin/training`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(trainingData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create training');
-    }
-
-    return response.json();
-  },
-
-  async updateTraining(trainingId: string, trainingData: any) {
-    const response = await fetch(`${API_BASE_URL}/admin/training/${trainingId}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(trainingData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to update training');
-    }
-
-    return response.json();
-  },
-
-  async deleteTraining(trainingId: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/training/${trainingId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete training');
     }
   },
 

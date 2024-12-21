@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/app/components/page-header';
 import { DocumentForm } from '@/app/components/forms/document-form';
 import { adminApi } from '@/app/lib/api';
+import { Document } from '@/app/lib/api/types';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 
 interface EditDocumentPageProps {
@@ -17,9 +18,9 @@ interface EditDocumentPageProps {
 export default function EditDocumentPage({ params }: EditDocumentPageProps) {
   const { isAdmin, isLoading } = useAuth();
   const router = useRouter();
-  const [document, setDocument] = useState(null);
-  const [employees, setEmployees] = useState([]);
-  const [error, setError] = useState(null);
+  const [document, setDocument] = useState<Document | null>(null);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function EditDocumentPage({ params }: EditDocumentPageProps) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Edit ${document?.title}`}
+        title={`Edit Document`}
         description="Update document information"
       />
       

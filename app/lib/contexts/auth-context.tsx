@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { usersApi } from '../api';
-import type { UserProfile } from '../api';
+import type { UserProfile } from '../api/types';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const calculateProfileCompleteness = (user: UserProfile): number => {
+  const calculateProfileCompleteness = (user: UserProfile | null): number => {
     if (!user) return 0;
 
     const fields = [
@@ -67,11 +67,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, []);
 
+  // Calculate name for user profile
+  useEffect(() => {
+    if (user && !user.name && user.firstName && user.lastName) {
+      setUser({
+        ...user,
+        name: `${user.firstName} ${user.lastName}`,
+      });
+    }
+  }, [user?.firstName, user?.lastName]);
+
   const value = {
     user,
     isLoading,
     isAdmin: user?.isAdmin ?? false,
-    profileCompleteness: calculateProfileCompleteness(user!),
+    profileCompleteness: calculateProfileCompleteness(user),
     refreshUser,
   };
 
